@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import Button from '../../ui/Button';
 
 function CreateUser() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('Jonas');
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -18,12 +19,12 @@ function CreateUser() {
         placeholder='Your full name'
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        className='w-72'
+        className='input mb-6 w-72'
       />
 
       {username !== '' && (
         <div>
-          <button>Start ordering</button>
+          <Button>Start ordering</Button>
         </div>
       )}
     </form>

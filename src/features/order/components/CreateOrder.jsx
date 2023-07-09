@@ -1,9 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import { useMutation } from 'react-query';
 import { createOrder } from '../../../services/apiRestaurant';
-import { Form, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Loader from '../../ui/Loader';
+import Button from '../../ui/Button';
+import { useState } from 'react';
 
 // https://uibakery.io/regex-library/phone-number
 // eslint-disable-next-line no-unused-vars
@@ -37,10 +39,14 @@ const fakeCart = [
 ];
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
   // eslint-disable-next-line no-unused-vars
-  const { register, handleSubmit, reset } = useForm();
-  // eslint-disable-next-line no-unused-vars
+  const [withPriority, setWithPriority] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
   const { mutate, isLoading } = useMutation(createOrder, {
     mutationKey: 'create-order',
@@ -59,49 +65,80 @@ function CreateOrder() {
     mutate(newOrder);
   };
   return (
-    <div>
-      <h2>Ready to order? Let&#39;s go!</h2>
-
-      <Form onSubmit={handleSubmit(submitHandler)}>
-        <div>
-          <label>First Name</label>
-          <input
-            type='text'
-            name='customer'
-            required
-            {...register('customer')}
-            disabled={isLoading}
-          />
+    <div className='px-4 py-6'>
+      <h2 className='mb-8 text-xl font-semibold'>
+        Ready to order? Let&#39;s go!
+      </h2>
+      <form
+        onSubmit={handleSubmit(submitHandler)}
+        noValidate
+      >
+        <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <label className='sm:basis-40'>Name</label>
+          <div className='grow'>
+            <input
+              type='text'
+              name='customer'
+              required
+              {...register('customer', {
+                required: 'Name is required.',
+              })}
+              disabled={isLoading}
+              className='input '
+            />
+            {errors.customer ? (
+              <p className='mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700'>
+                *{errors.customer.message}
+              </p>
+            ) : null}
+          </div>
         </div>
 
-        <div>
-          <label>Phone number</label>
-          <div>
+        <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <label className='sm:basis-40'>Phone number</label>
+          <div className='grow'>
             <input
               type='tel'
               name='phone'
               required
-              {...register('phone')}
+              {...register('phone', {
+                required: 'Phone number is required',
+                validate: (value) =>
+                  isValidPhone(value) || 'Phone number is invalid.',
+              })}
               disabled={isLoading}
+              className='input '
             />
+            {errors.phone ? (
+              <p className='mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700'>
+                *{errors.phone.message}
+              </p>
+            ) : null}
           </div>
         </div>
 
-        <div>
-          <label>Address</label>
-          <div>
+        <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <label className='sm:basis-40'>Address</label>
+          <div className='grow'>
             <input
               type='text'
               name='address'
               required
-              {...register('address')}
+              {...register('address', {
+                required: 'Address is required.',
+              })}
               disabled={isLoading}
-              className='w-full rounded-full border border-stone-200 px-4 py-2 transition-all duration-300 placeholder:text-stone-400 focus:outline-none focus:ring focus:ring-yellow-400'
+              className='input'
             />
+            {errors.address ? (
+              <p className='mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700'>
+                *{errors.address.message}
+              </p>
+            ) : null}
           </div>
         </div>
 
-        <div>
+        <div className='mt-12 flex items-center gap-4'>
           <input
             type='checkbox'
             name='priority'
@@ -112,18 +149,18 @@ function CreateOrder() {
             disabled={isLoading}
             className='h-6 w-6 accent-primary'
           />
-          <label htmlFor='priority'>Want to yo give your order priority?</label>
+          <label
+            htmlFor='priority'
+            className='font-medium'
+          >
+            Want to yo give your order priority?
+          </label>
         </div>
 
-        <div>
-          <button
-            disabled={isLoading}
-            className='inline-block rounded-full bg-yellow-400 px-4 py-2 font-semibold uppercase tracking-wide text-stone-800 transition-[shadow_colors] duration-300 hover:bg-yellow-300 hover:shadow-lg focus:outline-none focus:ring focus:ring-yellow-300 focus:ring-offset-2 disabled:cursor-not-allowed'
-          >
-            Order now
-          </button>
+        <div className='mt-6 text-center'>
+          <Button disabled={isLoading}>Order now</Button>
         </div>
-      </Form>
+      </form>
       {isLoading ? <Loader /> : null}
     </div>
   );

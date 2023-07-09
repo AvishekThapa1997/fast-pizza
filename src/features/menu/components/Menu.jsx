@@ -11,12 +11,11 @@ function Menu() {
     isError,
     error,
   } = useQuery('menus', getMenu);
-
   return (
     <>
-      {isFetching ? <Loader /> : null}
+      {isFetching && !pizzaMenus ? <Loader /> : null}
       {pizzaMenus && !isError ? (
-        <ul>
+        <ul className='divide-y divide-stone-200 px-2 py-4'>
           {pizzaMenus.map((pizza) => (
             <MenuItem
               pizza={pizza}
